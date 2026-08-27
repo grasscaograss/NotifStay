@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="page_bg">#F5F5F7</color>
+    <color name="glass_card">#FFFFFF</color>
+    <color name="glass_row">#F2F2F2</color>
+    <color name="glass_stroke">#14000000</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#99000000</color>
+    <color name="accent">#0068FF</color>
+    <color name="ok_green">#34C759</color>
+    <color name="fail_red">#FF3B30</color>
+</resources>
