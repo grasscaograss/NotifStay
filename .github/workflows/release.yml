@@ -30,8 +30,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 37
-          build-tools-version: 37.0.0
+          packages: 'platforms;android-37 build-tools;37.0.0'
 
       - name: Prepare signing keystore (if secrets configured)
         env:
