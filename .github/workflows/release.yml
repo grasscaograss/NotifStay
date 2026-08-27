@@ -28,9 +28,15 @@ jobs:
           gradle-version: '9.7.1'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-37 build-tools;37.0.0'
+        continue-on-error: true
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          export ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK"
+          SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$SM" ] || SM=$(find "$SDK" -name sdkmanager 2>/dev/null | head -1)
+          if [ -z "$SM" ]; then echo "sdkmanager not found"; exit 1; fi
+          yes | "$SM" --licenses >/dev/null 2>&1 || true
+          "$SM" "platforms;android-37" "build-tools;37.0.0"
 
       - name: Prepare signing keystore (if secrets configured)
         env:
@@ -51,6 +57,28 @@ jobs:
 
       - name: Build release APK
         run: ./gradlew --no-daemon --console=plain assembleRelease
+
+      - name: Collect SDK diagnostics
+        if: always()
+        run: |
+          {
+            echo "ANDROID_HOME=$ANDROID_HOME"
+            echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+            ls -1 /usr/local/lib/android/sdk 2>&1 || true
+            echo "--- platforms ---"
+            ls -1 /usr/local/lib/android/sdk/platforms 2>&1 || true
+            echo "--- build-tools ---"
+            ls -1 /usr/local/lib/android/sdk/build-tools 2>&1 || true
+            echo "--- sdkmanager ---"
+            find /usr/local/lib/android/sdk -maxdepth 4 -name sdkmanager 2>/dev/null || true
+          } > sdk-diagnostics.txt
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-diagnostics
+          path: sdk-diagnostics.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
